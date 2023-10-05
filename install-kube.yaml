@@ -94,14 +94,8 @@
      - name: Run containerd config default
        shell: containerd config default | tee /etc/containerd/config.toml
  
-     - name: Check SystemdCgroup setting before modification
-       shell: cat /etc/containerd/config.toml | grep SystemdCgroup
- 
      - name: Modify SystemdCgroup setting in containerd configuration
        shell: sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
- 
-     - name: Check SystemdCgroup setting after modification
-       shell: cat /etc/containerd/config.toml | grep SystemdCgroup
 
      - name: Create /etc/crictl.yaml file
        shell: |
@@ -157,3 +151,5 @@
 
      - name: Source the updated ~/.profile
        shell: source ~/.profile
+       args:
+         executable: /bin/bash
