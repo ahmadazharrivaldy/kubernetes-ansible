@@ -12,5 +12,5 @@ ansible -i hosts all -m ping
 ```
 Run ansible playbook
 ```
-ansible-playbook -i hosts install-k8s-containerd.yanl
+ansible-playbook -i hosts install-k8s-containerd.yaml
 ```
