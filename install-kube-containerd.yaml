@@ -56,8 +56,9 @@
        shell: curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
      - name: Create Docker Repository
-       path: "/etc/apt/sources.list.d/docker.list"
-       state: "touch"
+       file:
+         path: "/etc/apt/sources.list.d/docker.list"
+         state: "touch"
 
      - name: Add Docker Repository
        blockinfile:
@@ -66,8 +67,9 @@
                 deb https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
 
      - name: Create Kubernetes Repository
-       path: "/etc/apt/sources.list.d/kubernetes.list"
-       state: "touch"
+       file:
+         path: "/etc/apt/sources.list.d/kubernetes.list"
+         state: "touch"
 
      - name: Add Kubernetes Repository
        blockinfile:
