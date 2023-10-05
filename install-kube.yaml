@@ -39,7 +39,7 @@
          path: "/etc/sysctl.d/99-kubernetes-cri.conf"
          state: "touch"
 
-     - name: Add conf for containerd
+     - name: Add configuration for containerd
        blockinfile:
          path: "/etc/sysctl.d/99-kubernetes-cri.conf"
          block: |
@@ -98,13 +98,18 @@
        shell: sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
 
      - name: Create /etc/crictl.yaml file
-       shell: |
-         cat <<EOF | sudo tee /etc/crictl.yaml
-         runtime-endpoint: unix:///var/run/containerd/containerd.sock
-         image-endpoint: unix:///var/run/containerd/containerd.sock
-         timeout: 30
-         debug: false
-         EOF
+       file:
+         path: "/etc/crictl.yaml"
+         state: "touch"
+
+     - name: Add configuration for /etc/crictl.yaml
+       blockinfile:
+         path: "/etc/crictl.yaml"
+         block: |
+                runtime-endpoint: unix:///var/run/containerd/containerd.sock
+                image-endpoint: unix:///var/run/containerd/containerd.sock
+                timeout: 30
+                debug: false
 
      - name: Restart Containerd service
        systemd:
