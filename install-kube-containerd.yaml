@@ -54,12 +54,26 @@
  
      - name: Add Kubernetes GPG Key
        shell: curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
- 
+
+     - name: Create Docker Repository
+       path: "/etc/apt/sources.list.d/docker.list"
+       state: "touch"
+
      - name: Add Docker Repository
-       shell: echo "deb https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list
- 
+       blockinfile:
+         path: "/etc/apt/sources.list.d/docker.list"
+         block: |
+                deb https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable
+
+     - name: Create Kubernetes Repository
+       path: "/etc/apt/sources.list.d/kubernetes.list"
+       state: "touch"
+
      - name: Add Kubernetes Repository
-       shell: echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
+       blockinfile:
+         path: "/etc/apt/sources.list.d/kubernetes.list"
+         block: |
+                deb https://apt.kubernetes.io/ kubernetes-xenial main
 
      - name: Run apt update
        apt:
