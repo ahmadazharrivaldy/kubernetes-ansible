@@ -121,35 +121,3 @@
        fail:
          msg: "Containerd service is not in the 'active' state."
        when: containerd_status.changed
-
-     - name: Add source commands to ~/.profile on master
-       lineinfile:
-         path: ~/.profile
-         line: |
-           source <(kubectl completion bash)
-           source <(kubeadm completion bash)
-           source <(crictl completion bash)
-           source <(helm completion bash)
-           alias k=kubectl
-           complete -F __start_kubectl k
-           export KUBE_EDITOR=nano
-           export NOW="--force --grace-period 0"
-       when: inventory_hostname in groups['masters']
-
-     - name: Add source commands to ~/.profile on workers
-       lineinfile:
-         path: ~/.profile
-         line: |
-           source <(kubectl completion bash)
-           source <(kubeadm completion bash)
-           source <(crictl completion bash)
-           alias k=kubectl
-           complete -F __start_kubectl k
-           export KUBE_EDITOR=nano
-           export NOW="--force --grace-period 0"
-       when: inventory_hostname in groups['workers']
-
-     - name: Source the updated ~/.profile
-       shell: source ~/.profile
-       args:
-         executable: /bin/bash
