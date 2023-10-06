@@ -7,38 +7,38 @@
   connection: ssh
 
   tasks:
-     - name: Disable Firewall
+     - name: Disables the UFW firewall.
        command: ufw disable
 
-     - name: Turn off swap
+     - name: Deactivates swap.
        command: swapoff -a
 
-     - name: Remove swap entry from /etc/fstab
+     - name: Removes the swap entry from the /etc/fstab file.
        command: sed -i '/swap/d' /etc/fstab
 
-     - name: Create containerd config file
+     - name: Creates an empty config file for Containerd.
        file:
          path: "/etc/modules-load.d/containerd.conf"
          state: "touch"
 
-     - name: Add conf for containerd
+     - name: Adds overlay and br_netfilter to the Containerd configuration file.
        blockinfile:
          path: "/etc/modules-load.d/containerd.conf"
          block: |
                overlay
                br_netfilter
 
-     - name: modprobe
+     - name: Loads kernel modules for overlay and br_netfilter.
        shell: |
                sudo modprobe overlay
                sudo modprobe br_netfilter
 
-     - name: Set system configurations for Kubernetes networking
+     - name: Creates an empty sysctl configuration file.
        file:
          path: "/etc/sysctl.d/99-kubernetes-cri.conf"
          state: "touch"
 
-     - name: Add configuration for containerd
+     - name: Adds networking-related configurations to the sysctl configuration file.
        blockinfile:
          path: "/etc/sysctl.d/99-kubernetes-cri.conf"
          block: |
@@ -46,62 +46,62 @@
                 net.ipv4.ip_forward = 1
                 net.bridge.bridge-nf-call-ip6tables = 1
 
-     - name: Apply new settings
+     - name: Applies system configurations.
        command: sudo sysctl --system
 
-     - name: Add Docker GPG Key
+     - name: Adds the Docker GPG key to the system.
        shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
  
-     - name: Add Kubernetes GPG Key
+     - name: Adds the Kubernetes GPG key to the system.
        shell: curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
-     - name: Add Docker Repository
+     - name: Adds the Docker repository to the apt sources.
        shell: echo "deb https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list
  
-     - name: Add Kubernetes Repository
+     - name: Adds the Kubernetes repository to the apt sources.
        shell: echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee /etc/apt/sources.list.d/kubernetes.list
 
-     - name: Run apt update
+     - name: Updates the package cache.
        apt:
          update_cache: yes
        become: yes
 
-     - name: Install Helm on Master Node
+     - name: Installs Helm only on the master nodes.
        shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | sudo bash
        when: inventory_hostname in groups['masters']
 
-     - name: Install kubeadm
+     - name: Install the kubeadm package.
        apt:
          name: kubeadm
          state: present
  
-     - name: Install kubelet
+     - name: Install the kubelet package.
        apt:
          name: kubelet
          state: present
  
-     - name: Install kubectl
+     - name: Install the kubectl package.
        apt:
          name: kubectl
          state: present
  
-     - name: Install containerd.io
+     - name: Install the containerd.io package.
        apt:
          name: containerd.io
          state: present
 
-     - name: Run containerd config default
+     - name: Run Containerd config default.
        shell: containerd config default | tee /etc/containerd/config.toml
  
-     - name: Modify SystemdCgroup setting in containerd configuration
+     - name: Modify SystemdCgroup setting in containerd configuration.
        shell: sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
 
-     - name: Create /etc/crictl.yaml file
+     - name: Creates a YAML file for the CRI-O container runtime.
        file:
          path: "/etc/crictl.yaml"
          state: "touch"
 
-     - name: Add configuration for /etc/crictl.yaml
+     - name: Adds configurations to the CRI-O container runtime configuration file.
        blockinfile:
          path: "/etc/crictl.yaml"
          block: |
@@ -110,23 +110,23 @@
                 timeout: 30
                 debug: false
 
-     - name: Restart Containerd service
+     - name: Restart Containerd service.
        systemd:
          name: containerd
          state: restarted
 
-     - name: Check Containerd service status
+     - name: Check Containerd service status.
        systemd:
          name: containerd
          state: started
        register: containerd_status
  
-     - name: Ensure Containerd status is active
+     - name: Ensure Containerd status is active.
        fail:
          msg: "Containerd service is not in the 'active' state."
        when: containerd_status.changed
 
-     - name: Add configuration to ~/.profile on master
+     - name: Appends Kubernetes-related source commands and aliases to the ~/.profile file for master nodes.
        blockinfile:
          path: ~/.profile
          block: |
@@ -140,7 +140,7 @@
            export NOW="--force --grace-period 0"
        when: inventory_hostname in groups['masters']
 
-     - name: Add configuration to ~/.profile on workers
+     - name: Appends Kubernetes-related source commands and aliases to the ~/.profile file for worker nodes.
        blockinfile:
          path: ~/.profile
          block: |
@@ -153,7 +153,7 @@
            export NOW="--force --grace-period 0"
        when: inventory_hostname in groups['workers']
 
-     - name: Source the updated ~/.profile
+     - name: SReloads the ~/.profile file to apply the changes.
        shell: source ~/.profile
        args:
          executable: /bin/bash
