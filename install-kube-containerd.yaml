@@ -16,7 +16,7 @@
      - name: Removes the swap entry from the /etc/fstab file.
        command: sed -i '/swap/d' /etc/fstab
 
-     - name: Creates an empty config file for Containerd.
+     - name: Creates an empty configuration file for Containerd.
        file:
          path: "/etc/modules-load.d/containerd.conf"
          state: "touch"
@@ -90,13 +90,13 @@
          name: containerd.io
          state: present
 
-     - name: Run Containerd config default.
+     - name: Run containerd config default.
        shell: containerd config default | tee /etc/containerd/config.toml
  
-     - name: Modify SystemdCgroup setting in containerd configuration.
+     - name: Modify SystemdCgroup setting in Containerd configuration.
        shell: sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
 
-     - name: Creates a YAML file for the CRI-O container runtime.
+     - name: Creates an empty YAML file for the CRI-O container runtime.
        file:
          path: "/etc/crictl.yaml"
          state: "touch"
@@ -153,7 +153,7 @@
            export NOW="--force --grace-period 0"
        when: inventory_hostname in groups['workers']
 
-     - name: SReloads the ~/.profile file to apply the changes.
+     - name: Reloads the ~/.profile file to apply the changes.
        shell: source ~/.profile
        args:
          executable: /bin/bash
