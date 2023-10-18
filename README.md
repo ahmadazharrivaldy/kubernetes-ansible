@@ -12,5 +12,5 @@ ANSIBLE_HOST_KEY_CHECKING=False ansible -i hosts all -m ping
 ```
 Run ansible playbook
 ```
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts install-k8s-containerd.yaml
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts install-kube-containerd.yaml 
 ```
