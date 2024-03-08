@@ -49,14 +49,14 @@
      - name: Applies system configurations.
        command: sudo sysctl --system
 
+     - name: Create /etc/apt/keyrings directory.
+       shell: mkdir -p /etc/apt/keyrings
+
      - name: Adds the Docker GPG key to the system.
        shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
  
      - name: Adds the Kubernetes GPG key to the system.
        shell: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-
-     - name: Create /etc/apt/keyrings directory.
-       shell: mkdir -p /etc/apt/keyrings
 
      - name: Adds the Docker repository to the apt sources.
        shell: echo "deb https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list
